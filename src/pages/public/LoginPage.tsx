@@ -1,3 +1,4 @@
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Alert,
   Box,
@@ -7,11 +8,13 @@ import {
   Paper,
   TextField,
   Typography,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { shemaLogin, type LoginFormValues } from '../../models';
 import type { ActionState } from '../../interfaces';
-import { createInitialState, hanleZodError } from '../../helpers';
+import { createInitialState, handleZodError } from '../../helpers';
 import { useAlert, useAuth, useAxios } from '../../hooks';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -41,7 +44,7 @@ export const LoginPage = () => {
       login(response.data.token, { username: rawData.username });
       navigate('/perfil');
     } catch (error) {
-      const err = hanleZodError<LoginFormValues>(error, rawData);
+      const err = handleZodError<LoginFormValues>(error, rawData);
       console.log('err', err);
       showAlert(err.message, 'error');
       return err;
@@ -52,6 +55,13 @@ export const LoginPage = () => {
     loginApi,
     initialState
   );
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
 
   return (
     <Container
@@ -108,12 +118,22 @@ export const LoginPage = () => {
               required
               fullWidth
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               disabled={isPending}
               defaultValue={state?.formData?.password}
               error={!!state?.errors?.password}
               helperText={state?.errors?.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleTogglePassword} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
+
             <Button
               type="submit"
               fullWidth

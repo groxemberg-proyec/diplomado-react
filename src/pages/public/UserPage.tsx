@@ -6,16 +6,21 @@ import {
   Paper,
   TextField,
   Typography,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import type { ActionState } from '../../interfaces';
 import { schemaUser, type UserFormValues } from '../../models';
-import { createInitialState, hanleZodError } from '../../helpers';
+import { createInitialState, handleZodError } from '../../helpers';
 import { useAlert, useAxios } from '../../hooks';
 import { Link, useNavigate } from 'react-router-dom';
 import { useActionState } from 'react';
+import { useState } from 'react';
 
 type UserActionState = ActionState<UserFormValues>;
 const initialState = createInitialState<UserFormValues>();
+
 export const UserPage = () => {
   const axios = useAxios();
   const { showAlert } = useAlert();
@@ -39,7 +44,7 @@ export const UserPage = () => {
       showAlert('Usuario creado', 'success');
       navigate('/login');
     } catch (error) {
-      const err = hanleZodError<UserFormValues>(error, rawData);
+      const err = handleZodError<UserFormValues>(error, rawData);
       showAlert(err.message, 'error');
       return err;
     }
@@ -49,6 +54,10 @@ export const UserPage = () => {
     createUserApi,
     initialState
   );
+
+  // Estados para mostrar/ocultar las contraseñas
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <Container
@@ -75,10 +84,6 @@ export const UserPage = () => {
             Nuevo Usuario
           </Typography>
 
-          {/*  {Object.keys(state?.errors ?? {}).length !== 0 && (
-          <Alert severity="error">{state?.message}</Alert>
-        )} */}
-
           <Box action={submitAction} component={'form'} sx={{ width: '100%' }}>
             <TextField
               name="username"
@@ -94,30 +99,61 @@ export const UserPage = () => {
               error={!!state?.errors?.username}
               helperText={state?.errors?.username}
             />
+
             <TextField
               name="password"
               margin="normal"
               required
               fullWidth
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               disabled={isPending}
               defaultValue={state?.formData?.password}
               error={!!state?.errors?.password}
               helperText={state?.errors?.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
+
             <TextField
               name="confirmPassword"
               margin="normal"
               required
               fullWidth
               label="Repetir password"
-              type="password"
+              type={showConfirmPassword ? 'text' : 'password'}
               disabled={isPending}
               defaultValue={state?.formData?.confirmPassword}
               error={!!state?.errors?.confirmPassword}
               helperText={state?.errors?.confirmPassword}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? (
+                        <VisibilityOff />
+                      ) : (
+                        <Visibility />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
+
             <Button
               type="submit"
               fullWidth

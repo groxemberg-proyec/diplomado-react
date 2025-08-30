@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import type { TaskFilterDoneType, TaskType } from '../../components/tasks/type';
 import type { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 import { useAlert, useAxios } from '../../hooks';
-import { errorHelper, hanleZodError } from '../../helpers';
+import { errorHelper, handleZodError } from '../../helpers';
 import { schemaTask, type TaskFormValues } from '../../models';
 
 export const TasksPage = () => {
@@ -91,7 +91,7 @@ export const TasksPage = () => {
       handleCloseDialog();
       return;
     } catch (error) {
-      const err = hanleZodError<TaskFormValues>(error, rawData);
+      const err = handleZodError<TaskFormValues>(error, rawData);
       showAlert(err.message, 'error');
       return err;
     }

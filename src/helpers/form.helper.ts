@@ -9,16 +9,17 @@ export const createInitialState = <T>(): ActionState<T> => {
   };
 };
 
-export const hanleZodError = <T>(error: unknown, rawData: Partial<T>): ActionState<T> => {
+export const handleZodError = <T>(error: unknown, rawData: Partial<T>): ActionState<T> => {
   if (error instanceof z.ZodError) {
-    const fieldErros: Partial<Record<keyof T, string>> = {};
+    const fieldErrors: Partial<Record<keyof T, string>> = {};
     error.issues.forEach((issue) => {
       const field = issue.path[0] as keyof T;
-      fieldErros[field] = issue.message;
+      fieldErrors[field] = issue.message;
     });
+    console.error('Zod validation error:', fieldErrors);
     return {
-      errors: fieldErros,
-      message: 'Por favor corrige los errores en el formulaario',
+      errors: fieldErrors,
+      message: 'Por favor corrige los errores en el formulario',
       formData: rawData,
     };
   }
